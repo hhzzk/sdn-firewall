@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>SDN Firewall</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <style>
+        body {
+            background-color: #EEEEEE;
+        }
+        h1 {
+            font-size: 40px;
+            text-align: center;
+            margin-top: 50;
+            margin-bottom: 50;
+        }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>SDN FIREWALL</h1>
+
+  <ul class="nav nav-tabs">
+    <li class="active"><a data-toggle="tab" href="#menu2">Authentication</a></li>
+    <li ><a data-toggle="tab" href="#acladd">ACL Add</a></li>
+    <li><a data-toggle="tab" href="#aclrule">ACL Rule</a></li>
+    <li><a data-toggle="tab" href="#menu3">Menu 3</a></li>
+  </ul>
+
+  <div class="tab-content">
+
+    <div id="menu2" class="tab-pane fade in active">
+      <h3>Authentication</h3>
+      <!--<p>Only after authentication, you can set the acl rule. The username and password shoul be same with your OpenDaylight</p> -->
+      <p>. </p>
+      <p> </p>
+      <p> </p>
+  <form id="auth" class="form-horizontal">
+    <div class="form-group">
+      <label class="control-label col-sm-2" for="controller_ip">Controller IP:</label>
+      <div class="col-sm-6">
+        <input type="text" class="form-control" id="controller_ip" placeholder="OpenDaylight IP">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="control-label col-sm-2" for="controller_port">Controller Port:</label>
+      <div class="col-sm-6">
+        <input type="text" class="form-control" id="controller_port" placeholder="OpenDaylight REST API port">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="control-label col-sm-2" for="username">Username:</label>
+      <div class="col-sm-6">
+        <input type="text" class="form-control" id="username" placeholder="OpenDaylight username">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="control-label col-sm-2" for="password">Password:</label>
+      <div class="col-sm-6">
+        <input type="password" class="form-control" id="password" placeholder="OpenDaylight password">
+      </div>
+    </div>
+    <div class="form-group">        
+      <div class="col-sm-offset-5 col-sm-10">
+        <button id=authentication type="submit" class="btn btn-success">Authentication</button>
+      </div>
+    </div>
+  </form>
+    </div>
+
+    <div id="acladd" class="tab-pane fade">
+  <h2>Add ACL Rule</h2>
+  <form id="addacl" class="form-horizontal">
+    <div class="form-group">
+        <label class="control-label col-sm-2" for="aclype">ACL Type:</label>
+      <div class="col-sm-6">
+        <select class="form-control" id="acltype">
+            <option>Mixed</option>
+            <option>Ethernet</option>
+            <option>IPv4</option>
+            <option>IPv6</option>
+            <option>VLAN</option>
+            <option>Port</option>
+            <option>Interface</option>
+        </select>
+    </div>
+    </div>
+
+    <div class="form-group">
+      <label class="control-label col-sm-2" for="sourcemac">Source MAC:</label>
+      <div class="col-sm-6">
+        <input type="text" class="form-control" id="sourcemac" placeholder="source mac address">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="control-label col-sm-2" for="destinationmac">Destination MAC:</label>
+      <div class="col-sm-6">
+        <input type="text" class="form-control" id="destinationmac" placeholder="destination mac address">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="control-label col-sm-2" for="sourceip">Source IP:</label>
+      <div class="col-sm-6">
+        <input type="text" class="form-control" id="sourceip" placeholder="source ip">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="control-label col-sm-2" for="sourceipmask">Source IP Mask:</label>
+      <div class="col-sm-6">
+        <input type="text" class="form-control" id="sourceipmask" placeholder="source ip mask">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="control-label col-sm-2" for="destinationip">Destination IP:</label>
+      <div class="col-sm-6">
+        <input type="text" class="form-control" id="destinationip" placeholder="destination ip">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="control-label col-sm-2" for="destipmask">destinationIP Mask:</label>
+      <div class="col-sm-6">
+        <input type="text" class="form-control" id="destinationipmask" placeholder="destination ip mask">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="control-label col-sm-2" for="vlan">VLAN:</label>
+      <div class="col-sm-6">
+        <input type="text" class="form-control" id="vlan" placeholder="vlan number">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="control-label col-sm-2" for="port">Port:</label>
+      <div class="col-sm-6">
+        <input type="text" class="form-control" id="port" placeholder="protocol port">
+      </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-sm-2" for="action">Action:</label>
+      <div class="col-sm-6">
+        <select class="form-control" id="action">
+            <option>DENY</option>
+            <option>PERMIT</option>
+        </select>
+    </div>
+    </div>
+    <div class="form-group">        
+      <div class="col-sm-offset-5 col-sm-10">
+        <button type="submit" class="btn btn-success" id=addaclrule>Submit</button>
+      </div>
+    </div>
+  </form>
+    </div>
+    <div id="aclrule" class="tab-pane fade">
+  <h2>ACL Rules</h2>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Rule</th>
+        <th>Action</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="info">
+        <td>source_ip=192.168.10.2;ip_mask=255.255.255.0</td>
+        <td>DENY</td>
+        <th>
+            <button type="button" class="btn btn-danger">Delete</button>
+        </th>
+      </tr>
+      <tr class="success">
+        <td>destination_ip=10.2.1.10</td>
+        <td>DENY</td>
+        <th>
+            <button type="button" class="btn btn-danger">Delete</button>
+        </th>
+      </tr>
+      </tr>
+      <tr class="warning">
+        <td>source_mac=0A-56-6B-05-32-2A</td>
+        <td>DENY</td>
+        <th>
+            <button type="button" class="btn btn-danger">Delete</button>
+        </th>
+      </tr>
+      <tr class="active">
+        <td>source_ip=10.0.2.1;port=23</td>
+        <td>PERMIT</td>
+        <th>
+            <button type="button" class="btn btn-danger">Delete</button>
+        </th>
+      </tr>
+    </tbody>
+  </table>
+
+    </div>
+    <div id="menu3" class="tab-pane fade">
+      <h3>Menu 3</h3>
+      <p>Eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.</p>
+    </div>
+  </div>
+</div>
+
+    <script>
+
+        $(document).ready(function () {
+            $('#authentication').click(function (event) {
+
+                var controller_ip = $("#controller_ip").val();
+                var controller_port = $("#controller_port").val();
+                var username = $("#username").val();
+                var password = $("#password").val();
+
+                var data =
+                {
+                        post_type: 'authentication',
+                        controller_ip : controller_ip,
+                        controller_port: controller_port,
+                        authentication: "Basic "+btoa(username+":"+password)
+                };
+
+                var dataToSend = JSON.stringify(data);
+
+                $.ajax(
+                        {
+                            url: '/setaclrule/',
+                            type: 'POST',
+                            data: dataToSend,
+
+                            success: function (jsonResponse) {
+                                alert('Authentication Success');
+                            },
+                            error: function () {
+                                alert("Authentication Fail");
+
+                            }
+                        });
+
+                event.preventDefault();
+            });
+            
+            $('#addaclrule').click(function (event) {
+
+                var acltype = $("#acltype").val();
+                var sourcemac = $("#sourcemac").val();
+                var destinationmac = $("#destinationmac").val();
+                var sourceip= $("#sourceip").val();
+                var destinationip = $("#destinationip").val();
+                var destinationipmask = $("#destinationipmask").val();
+                var sourceipmask = $("#sourceipmask").val();
+                var vlan = $("#vlan").val();
+                var port = $("#port").val();
+                var action = $("#action").val();
+
+                var data =
+                {
+                        post_type: 'aclrule',
+                        acltype : acltype,
+                        sourcemac : sourcemac,
+                        destinationmac : destinationmac,
+                        sourceip : sourceip,
+                        destinationip : destinationip,
+                        destinationipmask : destinationipmask,
+                        sourceipmask : sourceipmask,
+                        vlan : vlan,
+                        port : port,
+                        action : action
+                };
+
+                var dataToSend = JSON.stringify(data);
+
+                $.ajax(
+                        {
+                            url: '/setaclrule/',
+                            type: 'POST',
+                            data: dataToSend,
+
+                            success: function (jsonResponse) {
+                                alert('Set ACL Rule Success');
+                            },
+                            error: function () {
+                                alert("Set ACL Rule Fail");
+
+                            }
+                        });
+
+                event.preventDefault();
+            });
+        });
+
+    </script>
+
+</body>
+</html>

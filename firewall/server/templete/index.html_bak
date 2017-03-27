@@ -1,0 +1,106 @@
+<head>
+<script language="javascript">
+function ckFrm(){
+
+var uname = window.document.frm.uname.value;
+if(uname==""){
+alert("用户名不能为空！");
+document.frm.uname.focus();
+return false ;
+}
+var pas = document.frm.pas;
+var pas2 = document.frm.pas2;
+if(pas.value=="") {
+alert("密码不能为空");
+document.frm.pas.focus();
+return false;
+}
+if(pas.value!=pas2.value) {
+alert("两次输入的密码不一致");
+return false;
+}
+
+
+if(!(document.frm.gender[0].checked || document.frm.gender[1].checked)) {
+alert("总得选个性别吧");
+return false;
+}
+
+var habbyArr = document.frm.habby;
+var flag = false;
+for(var i;i<habbyArr.length;i++) {
+if(habbyArr[i].checked){
+flag = true;
+}
+if(!flag) {
+alert("选择一个你喜欢的吧");
+}
+return flag;
+}
+}
+
+</script>
+</head>
+
+  <form class="form-horizontal">
+    <fieldset>
+      <div id="legend" class="">
+        <legend class="">Add ACL Rule</legend>
+      </div>
+    
+    <div class="control-group">
+
+          <!-- Select Basic -->
+          <label class="control-label">ACL Type</label>
+          <div class="controls">
+            <select class="input-xlarge">
+      <option>Ethernet</option>
+      <option>IPv4</option>
+      <option>IPv6</option>
+      <option>Vlan</option>
+      <option>Port</option>
+      <option>Interface</option></select>
+          </div>
+
+        </div><div class="control-group">
+
+          <!-- Text input-->
+          <label class="control-label" for="input01">Source MAC </label>
+          <div class="controls">
+            <input type="text" placeholder="MAC address" class="input-xlarge">
+            <p class="help-block"></p>
+          </div>
+        </div><div class="control-group">
+
+          <!-- Text input-->
+          <label class="control-label" for="input01">Source IP </label>
+          <div class="controls">
+            <input type="text" placeholder="source ip address" class="input-xlarge">
+            <p class="help-block"></p>
+          </div>
+        </div>
+
+    <div class="control-group">
+
+          <!-- Text input-->
+          <label class="control-label" for="input01">Destination IP</label>
+          <div class="controls">
+            <input type="text" placeholder="destination ip address" class="input-xlarge">
+            <p class="help-block"></p>
+          </div>
+        </div>
+
+    <div class="control-group">
+          <label class="control-label"></label>
+
+          <!-- Button -->
+          <div class="controls">
+            <button class="btn btn-default">Submit</button>
+          </div>
+        </div>
+
+    </fieldset>
+  </form>
+    
+</body>
+</html>
