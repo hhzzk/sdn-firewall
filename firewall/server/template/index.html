@@ -76,16 +76,9 @@
   <h2>Add ACL Rule</h2>
   <form id="addacl" class="form-horizontal">
     <div class="form-group">
-        <label class="control-label col-sm-2" for="aclype">ACL Type:</label>
+        <label class="control-label col-sm-2" for="nodeid">Node ID:</label>
       <div class="col-sm-6">
-        <select class="form-control" id="acltype">
-            <option>Mixed</option>
-            <option>Ethernet</option>
-            <option>IPv4</option>
-            <option>IPv6</option>
-            <option>VLAN</option>
-            <option>Port</option>
-            <option>Interface</option>
+        <select class="form-control" id="nodeid" name="nodeid">
         </select>
     </div>
     </div>
@@ -103,27 +96,16 @@
       </div>
     </div>
     <div class="form-group">
-      <label class="control-label col-sm-2" for="sourceip">Source IP:</label>
+      <label class="control-label col-sm-2" for="sourceip">Source IP / Mask:</label>
       <div class="col-sm-6">
-        <input type="text" class="form-control" id="sourceip" placeholder="source ip">
+        <input type="text" class="form-control" id="sourceip" placeholder="source ip / mask">
       </div>
     </div>
+
     <div class="form-group">
-      <label class="control-label col-sm-2" for="sourceipmask">Source IP Mask:</label>
+      <label class="control-label col-sm-2" for="destinationip">Destination IP / Mask:</label>
       <div class="col-sm-6">
-        <input type="text" class="form-control" id="sourceipmask" placeholder="source ip mask">
-      </div>
-    </div>
-    <div class="form-group">
-      <label class="control-label col-sm-2" for="destinationip">Destination IP:</label>
-      <div class="col-sm-6">
-        <input type="text" class="form-control" id="destinationip" placeholder="destination ip">
-      </div>
-    </div>
-    <div class="form-group">
-      <label class="control-label col-sm-2" for="destipmask">destinationIP Mask:</label>
-      <div class="col-sm-6">
-        <input type="text" class="form-control" id="destinationipmask" placeholder="destination ip mask">
+        <input type="text" class="form-control" id="destinationip" placeholder="destination ip / mask">
       </div>
     </div>
     <div class="form-group">
@@ -232,6 +214,15 @@
                             data: dataToSend,
 
                             success: function (jsonResponse) {
+
+                                nodes = $.parseJSON(jsonResponse);
+                                var opts = "";
+                                for(var i = 0; i < nodes.length; i++) {
+                                    opts += "<option value='" + nodes[i] + "'>" + nodes[i] + "</option>";
+                                }
+                                $( 'select[name="nodeid"]' ).append( opts);
+
+
                                 alert('Authentication Success');
                             },
                             error: function () {
@@ -245,13 +236,11 @@
             
             $('#addaclrule').click(function (event) {
 
-                var acltype = $("#acltype").val();
+                var nodeid = $("#nodeid").val();
                 var sourcemac = $("#sourcemac").val();
                 var destinationmac = $("#destinationmac").val();
                 var sourceip= $("#sourceip").val();
                 var destinationip = $("#destinationip").val();
-                var destinationipmask = $("#destinationipmask").val();
-                var sourceipmask = $("#sourceipmask").val();
                 var vlan = $("#vlan").val();
                 var port = $("#port").val();
                 var action = $("#action").val();
@@ -259,13 +248,11 @@
                 var data =
                 {
                         post_type: 'aclrule',
-                        acltype : acltype,
+                        nodeid : nodeid,
                         sourcemac : sourcemac,
                         destinationmac : destinationmac,
                         sourceip : sourceip,
                         destinationip : destinationip,
-                        destinationipmask : destinationipmask,
-                        sourceipmask : sourceipmask,
                         vlan : vlan,
                         port : port,
                         action : action
@@ -280,7 +267,7 @@
                             data: dataToSend,
 
                             success: function (jsonResponse) {
-                                alert('Set ACL Rule Success');
+                                alert("Set ACL Rule Success");
                             },
                             error: function () {
                                 alert("Set ACL Rule Fail");
