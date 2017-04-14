@@ -10,7 +10,10 @@ class SDNFirewall(object):
         self.application = None
 
     def make_app(self):
-        return Application(paths,)
+        return Application(
+                paths,
+                cookie_secret="__TODO:_GENERATE_YOUR_OWN_RANDOM_VALUE_HERE__"
+        )
     
     def start(self):
         print('Start server @ %s....' % self.port)

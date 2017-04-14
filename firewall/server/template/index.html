@@ -115,9 +115,15 @@
       </div>
     </div>
     <div class="form-group">
-      <label class="control-label col-sm-2" for="port">Port:</label>
+      <label class="control-label col-sm-2" for="port">Protocol:</label>
       <div class="col-sm-6">
-        <input type="text" class="form-control" id="port" placeholder="protocol port">
+        <select class="form-control" id="port">
+            <option></option>
+            <option value="1">ICMP</option>
+            <option value="6">TCP</option>
+            <option value="17">UDP</option>
+            <option value="88">IGMP</option>
+        </select>
       </div>
     </div>
     <div class="form-group">
@@ -249,12 +255,12 @@
                 {
                         post_type: 'aclrule',
                         nodeid : nodeid,
-                        sourcemac : sourcemac,
-                        destinationmac : destinationmac,
-                        sourceip : sourceip,
-                        destinationip : destinationip,
+                        source_mac : sourcemac,
+                        dest_mac : destinationmac,
+                        source_ip : sourceip,
+                        dest_ip : destinationip,
                         vlan : vlan,
-                        port : port,
+                        protocol: port,
                         action : action
                 };
 
