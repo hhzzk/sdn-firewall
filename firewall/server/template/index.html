@@ -169,7 +169,6 @@
 
 function show_acl_rules(rules)
 {
-    alert(rules);
     var trs = "";
     var x = 0;
     colors = ['info', 'warning', 'success', 'active'];
@@ -177,9 +176,9 @@ function show_acl_rules(rules)
     for(var i = 0; i < rules.length; i++) {
         action = parseInt(rules[i]['action'])
         x = Math.floor((Math.random() * 10)/4)
-        trs += "<tr class='" + colors[x]+ "'><td>" + rules[i]['rule'] + "</td><td>" + actions[action] + "</td><th><button type='button' class='btn btn-danger' value='" + rules[i]['id'] + "'  onclick='del_acl_rule(this.value)' >Delete</button></th></tr>";
+        trs += "<tr class='" + colors[x]+ "'><td>" + rules[i]['condition'] + "</td><td>" + actions[action] + "</td><th><button type='button' class='btn btn-danger' value='" + rules[i]['id'] + "'  onclick='del_acl_rule(this.value)' >Delete</button></th></tr>";
     }
-    $( 'tbody[name="aclrules"]' ).append( trs);
+    $( 'tbody[name="aclrules"]' ).html( trs);
 }
 
         $(document).ready(function () {

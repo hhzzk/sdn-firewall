@@ -1,6 +1,7 @@
 import ast
 import json
 import uuid
+import copy
 import logging
 
 import requests
@@ -37,6 +38,14 @@ class GetACLRuleHandler(RequestHandler):
     def get(self):
         with open('rules.json') as data_file:
             rules_list = json.load(data_file)
+
+        rule = ''
+        for item in rules_list:
+            condition = item['condition']
+            for one in condition:
+                if(condition[one]):
+                    rule += one + '=' + condition[one] + ', '
+            item['condition'] = rule
 
         self.write(json.dumps(rules_list))
 
@@ -76,22 +85,12 @@ class SetACLRuleHandler(RequestHandler):
             except:
                 self.write(500) 
 
-        rule = {
-            'source_mac' : '',
-            'dest_mac'   : '',
-            'source_ip'  : '',
-            'dest_ip'    : '',
-            'protocol'   : '',
-            'nodeid'     : '',
-            'action'     : '0'
-        }
+        body_tmp = {}
         is_exist = False
         for temp in rules_list:
             if(temp['id'] == acl_id):
-                temp_rule = ast.literal_eval(temp['rule'])
-                for key,value in temp_rule.iteritems():
-                    rule[key] = value 
-                rule['action'] = str(temp['action'])
+                body_tmp = temp['condition']
+                body_tmp['action'] = str(temp['action'])
                 rules_list.remove(temp)
                 is_exist = True
                 break
@@ -111,7 +110,7 @@ class SetACLRuleHandler(RequestHandler):
         remove_acl_api = '/restconf/operations/sal-flow:remove-flow'
         url = base_url + remove_acl_api
 
-        payload = self.generate_xml(rule)
+        payload = self.generate_xml(body_tmp)
         #import pdb;pdb.set_trace()
         headers = {
                 'authorization': base_auth,
@@ -226,15 +225,14 @@ class SetACLRuleHandler(RequestHandler):
             self.write("Please Authentication")
             return
 
-        condition = ''
-        for item in body:
-            if(body[item] and item != 'action' and item != 'post_type'):
-                condition += item + '=' + body[item]
         
-        action = body['action']
+        body_cp = copy.deepcopy(body)
+        action = body_cp['action']
+        body_cp.pop('action')
+        body_cp.pop('post_type')
         rule = {
             "id"     : str(uuid.uuid1()),
-            "rule"   : condition,
+            "condition"   : body_cp,
             "action" : action
         }
 
@@ -247,7 +245,7 @@ class SetACLRuleHandler(RequestHandler):
 
         add_rule = True
         for temp in rules_list:
-            if(temp['rule'] == rule['rule']):
+            if(temp['condition'] == rule['condition']):
                 if(temp['action'] != rule['action']):
                     rules_list.append(rule)
                     rules_list.remove(temp)
