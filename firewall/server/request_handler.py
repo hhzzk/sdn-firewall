@@ -1,6 +1,7 @@
+import ast
 import json
+import uuid
 import logging
-import xml.etree.ElementTree as ET
 
 import requests
 from tornado.web import RequestHandler
@@ -26,6 +27,19 @@ class IndexHandler(RequestHandler):
     def get(self):
         self.render("template/index.html")
 
+class GetACLRuleHandler(RequestHandler):
+    def initialize(self):
+        logger.info(
+            'Receive request from %s',
+            self.request.remote_ip
+        )
+
+    def get(self):
+        with open('rules.json') as data_file:
+            rules_list = json.load(data_file)
+
+        self.write(json.dumps(rules_list))
+
 
 class SetACLRuleHandler(RequestHandler):
     def initialize(self):
@@ -41,9 +55,78 @@ class SetACLRuleHandler(RequestHandler):
         if request_body:
             if request_body['post_type'] == 'aclrule':
                 self.set_acl_rule(request_body)
+            elif request_body['post_type'] == 'deleteacl':
+                self.del_acl_rule(request_body)
             else:
                 self.authentication(request_body)
 
+        return
+
+    def del_acl_rule(self, body):
+        if not self.get_secure_cookie("base_auth"):
+            self.write("Please Authentication")
+            return
+
+        acl_id = body['id']
+
+        rules_list = []
+        with open('rules.json') as data_file:
+            try:
+                rules_list = json.load(data_file)
+            except:
+                self.write(500) 
+
+        rule = {
+            'source_mac' : '',
+            'dest_mac'   : '',
+            'source_ip'  : '',
+            'dest_ip'    : '',
+            'protocol'   : '',
+            'nodeid'     : '',
+            'action'     : '0'
+        }
+        is_exist = False
+        for temp in rules_list:
+            if(temp['id'] == acl_id):
+                temp_rule = ast.literal_eval(temp['rule'])
+                for key,value in temp_rule.iteritems():
+                    rule[key] = value 
+                rule['action'] = str(temp['action'])
+                rules_list.remove(temp)
+                is_exist = True
+                break
+
+        if not is_exist:
+            return
+
+        with open('rules.json', 'w') as outfile:
+            json.dump(rules_list, outfile)
+
+        controller_ip = self.get_secure_cookie("controller_ip")
+        controller_port = self.get_secure_cookie("controller_port")
+        base_auth = self.get_secure_cookie("base_auth")
+
+        base_url = 'http://' + str(controller_ip) + ':' \
+                + str(controller_port)
+        remove_acl_api = '/restconf/operations/sal-flow:remove-flow'
+        url = base_url + remove_acl_api
+
+        payload = self.generate_xml(rule)
+        #import pdb;pdb.set_trace()
+        headers = {
+                'authorization': base_auth,
+                'content-type': "application/xml" 
+            }
+        ret = requests.post(
+                url,
+                data=payload,
+                headers=headers
+            )
+
+        if ret.status_code == 200:
+            self.write( json.dumps(rules_list))
+        else:
+            self.write_error(500)
         return
 
 
@@ -103,31 +186,37 @@ class SetACLRuleHandler(RequestHandler):
         xml_header = '<?xml version="1.0" encoding="UTF-8" standalone="no"?><input xmlns="urn:opendaylight:flow:service">'
         common_element = \
             '<barrier>false</barrier>' + \
-            '<cookie>55</cookie>' + \
+            '<cookie>136</cookie>' + \
             '<flags>SEND_FLOW_REM</flags>' + \
-            '<hard-timeout>0</hard-timeout>' + \
-            '<idle-timeout>0</idle-timeout>' + \
+            '<hard-timeout>100</hard-timeout>' + \
+            '<idle-timeout>100</idle-timeout>' + \
             '<installHw>false</installHw>' + \
+            '<strict>false</strict>' + \
+            '<table_id>0</table_id>'
+
+        if(int(body['action']) == 0):
+            action_element = '<action><order>0</order><drop-action/></action>'
+        else:
+            action_element = '<action><order>0</order><output-action><output-node-connector>ALL</output-node-connector><max-length>60</max-length></output-action></action>'
+
+        instructions_element = \
                 '<instructions>' + \
                     '<instruction>' + \
                         '<order>0</order>' + \
                         '<apply-actions>' + \
-                            '<action>' + \
-                                '<order>0</order>' + \
-                                '<drop-action/>' + \
-                            '</action>' + \
+                            action_element + \
                         '</apply-actions>' + \
                     '</instruction>' + \
-                '</instructions>' + \
-            '<strict>false</strict>' + \
-            '<table_id>0</table_id>'
+                '</instructions>' 
 
         match_element = self.generate_match_xml(body)
-        priority_element = '<priority>2</priority>'
-        node_element = '<node xmlns:inv="urn:opendaylight:inventory">/inv:nodes/inv:node[inv:id="openflow:1"]</node>'
+        priority_element = '<priority>3</priority>'
+
+        node_id = body['nodeid']
+        node_element = '<node xmlns:inv="urn:opendaylight:inventory">/inv:nodes/inv:node[inv:id="' + str(node_id) + '"]</node>'
         xml_tail = '</input>'
 
-        xml = xml_header + common_element + match_element + priority_element + node_element + xml_tail
+        xml = xml_header + common_element + match_element + instructions_element + priority_element + node_element + xml_tail
 
         return xml
 
@@ -136,6 +225,41 @@ class SetACLRuleHandler(RequestHandler):
         if not self.get_secure_cookie("base_auth"):
             self.write("Please Authentication")
             return
+
+        condition = ''
+        for item in body:
+            if(body[item] and item != 'action' and item != 'post_type'):
+                condition += item + '=' + body[item]
+        
+        action = body['action']
+        rule = {
+            "id"     : str(uuid.uuid1()),
+            "rule"   : condition,
+            "action" : action
+        }
+
+        rules_list = []
+        with open('rules.json') as data_file:
+            try:
+                rules_list = json.load(data_file)
+            except:
+                pass 
+
+        add_rule = True
+        for temp in rules_list:
+            if(temp['rule'] == rule['rule']):
+                if(temp['action'] != rule['action']):
+                    rules_list.append(rule)
+                    rules_list.remove(temp)
+                    add_rule = False
+                else:
+                    return
+
+        if add_rule:
+            rules_list.append(rule)
+        with open('rules.json', 'w') as outfile:
+            json.dump(rules_list, outfile)
+
 
         controller_ip = self.get_secure_cookie("controller_ip")
         controller_port = self.get_secure_cookie("controller_port")

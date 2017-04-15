@@ -24,10 +24,10 @@
 <div class="container">
   <h1>SDN FIREWALL</h1>
 
-  <ul class="nav nav-tabs">
+  <ul class="nav nav-tabs" id="menu">
     <li class="active"><a data-toggle="tab" href="#menu2">Authentication</a></li>
     <li ><a data-toggle="tab" href="#acladd">ACL Add</a></li>
-    <li><a data-toggle="tab" href="#aclrule">ACL Rule</a></li>
+    <li ><a data-toggle="tab" id=rule_refresh href="#aclrule">ACL Rule</a></li>
     <li><a data-toggle="tab" href="#menu3">Menu 3</a></li>
   </ul>
 
@@ -130,8 +130,8 @@
         <label class="control-label col-sm-2" for="action">Action:</label>
       <div class="col-sm-6">
         <select class="form-control" id="action">
-            <option>DENY</option>
-            <option>PERMIT</option>
+            <option value="0">DENY</option>
+            <option value="1">PERMIT</option>
         </select>
     </div>
     </div>
@@ -143,7 +143,7 @@
   </form>
     </div>
     <div id="aclrule" class="tab-pane fade">
-  <h2>ACL Rules</h2>
+        <h2>ACL Rules   </h2> 
   <table class="table">
     <thead>
       <tr>
@@ -152,36 +152,8 @@
         <th></th>
       </tr>
     </thead>
-    <tbody>
-      <tr class="info">
-        <td>source_ip=192.168.10.2;ip_mask=255.255.255.0</td>
-        <td>DENY</td>
-        <th>
-            <button type="button" class="btn btn-danger">Delete</button>
-        </th>
-      </tr>
-      <tr class="success">
-        <td>destination_ip=10.2.1.10</td>
-        <td>DENY</td>
-        <th>
-            <button type="button" class="btn btn-danger">Delete</button>
-        </th>
-      </tr>
-      </tr>
-      <tr class="warning">
-        <td>source_mac=0A-56-6B-05-32-2A</td>
-        <td>DENY</td>
-        <th>
-            <button type="button" class="btn btn-danger">Delete</button>
-        </th>
-      </tr>
-      <tr class="active">
-        <td>source_ip=10.0.2.1;port=23</td>
-        <td>PERMIT</td>
-        <th>
-            <button type="button" class="btn btn-danger">Delete</button>
-        </th>
-      </tr>
+    <tbody id="aclrules" name="aclrules">
+
     </tbody>
   </table>
 
@@ -195,7 +167,48 @@
 
     <script>
 
+function show_acl_rules(rules)
+{
+    alert(rules);
+    var trs = "";
+    var x = 0;
+    colors = ['info', 'warning', 'success', 'active'];
+    actions = ['DENY', 'PERMIT'];
+    for(var i = 0; i < rules.length; i++) {
+        action = parseInt(rules[i]['action'])
+        x = Math.floor((Math.random() * 10)/4)
+        trs += "<tr class='" + colors[x]+ "'><td>" + rules[i]['rule'] + "</td><td>" + actions[action] + "</td><th><button type='button' class='btn btn-danger' value='" + rules[i]['id'] + "'  onclick='del_acl_rule(this.value)' >Delete</button></th></tr>";
+    }
+    $( 'tbody[name="aclrules"]' ).append( trs);
+}
+
         $(document).ready(function () {
+
+  $('#rule_refresh').click(function(event)  {
+                            
+                var data = {};
+                var dataToSend = JSON.stringify(data);
+
+                $.ajax(
+                        {
+                            url: '/getaclrule/',
+                            type: 'GET',
+                            data: dataToSend,
+
+                            success: function (jsonResponse){
+                                rules = $.parseJSON(jsonResponse);
+                                show_acl_rules(rules);
+                            },
+
+                            error: function() {
+                                alert("Get ACL rule fail"); 
+                            }
+                        });
+                event.preventDefault();
+
+});
+
+
             $('#authentication').click(function (event) {
 
                 var controller_ip = $("#controller_ip").val();
@@ -227,7 +240,6 @@
                                     opts += "<option value='" + nodes[i] + "'>" + nodes[i] + "</option>";
                                 }
                                 $( 'select[name="nodeid"]' ).append( opts);
-
 
                                 alert('Authentication Success');
                             },
@@ -284,6 +296,36 @@
                 event.preventDefault();
             });
         });
+
+
+function del_acl_rule(acl_id) 
+{
+                var data =
+                {
+                        post_type: 'deleteacl',
+                        id : acl_id
+                };
+
+                var dataToSend = JSON.stringify(data);
+
+                $.ajax(
+                        {
+                            url: '/setaclrule/',
+                            type: 'POST',
+                            data: dataToSend,
+
+                            success: function (jsonResponse) {
+                                rules = $.parseJSON(jsonResponse);
+                                show_acl_rules(rules);
+                            },
+                            error: function () {
+                                alert("Del ACL Rule Fail");
+
+                            }
+                        });
+
+                event.preventDefault();
+}
 
     </script>
 

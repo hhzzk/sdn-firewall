@@ -1,7 +1,7 @@
 from tornado.ioloop import IOLoop
 from tornado.web import Application
 
-from request_handler import IndexHandler, SetACLRuleHandler
+from request_handler import IndexHandler, GetACLRuleHandler, SetACLRuleHandler
 
 class SDNFirewall(object):
     def __init__(self, paths, port):
@@ -26,6 +26,7 @@ if __name__ == '__main__':
     paths = [
                 (r"/", IndexHandler),
                 (r"/setaclrule/", SetACLRuleHandler),
+                (r"/getaclrule/", GetACLRuleHandler),
             ]
     port = 8888
 
