@@ -39,8 +39,8 @@ class GetACLRuleHandler(RequestHandler):
         with open('rules.json') as data_file:
             rules_list = json.load(data_file)
 
-        rule = ''
         for item in rules_list:
+            rule = ''
             condition = item['condition']
             for one in condition:
                 if(condition[one]):
@@ -123,6 +123,14 @@ class SetACLRuleHandler(RequestHandler):
             )
 
         if ret.status_code == 200:
+            for item in rules_list:
+                rule = ''
+                condition = item['condition']
+                for one in condition:
+                    if(condition[one]):
+                        rule += one + '=' + condition[one] + ', '
+                item['condition'] = rule
+
             self.write( json.dumps(rules_list))
         else:
             self.write_error(500)
@@ -187,8 +195,8 @@ class SetACLRuleHandler(RequestHandler):
             '<barrier>false</barrier>' + \
             '<cookie>136</cookie>' + \
             '<flags>SEND_FLOW_REM</flags>' + \
-            '<hard-timeout>100</hard-timeout>' + \
-            '<idle-timeout>100</idle-timeout>' + \
+            '<hard-timeout>0</hard-timeout>' + \
+            '<idle-timeout>0</idle-timeout>' + \
             '<installHw>false</installHw>' + \
             '<strict>false</strict>' + \
             '<table_id>0</table_id>'
@@ -307,7 +315,8 @@ class SetACLRuleHandler(RequestHandler):
             try:
                 nodes = network_topology['topology'][0]['node']
                 for node in nodes:
-                    node_list.append(node['node-id'])
+                    if 'host' not in node['node-id']:
+                        node_list.append(node['node-id'])
             except:
                pass 
 
