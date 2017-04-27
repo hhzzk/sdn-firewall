@@ -25,16 +25,16 @@
   <h1>SDN FIREWALL</h1>
 
   <ul class="nav nav-tabs" id="menu">
-    <li class="active"><a data-toggle="tab" href="#menu2">Authentication</a></li>
+    <li class="active"><a data-toggle="tab" href="#menu2">Authorization</a></li>
     <li ><a data-toggle="tab" href="#acladd">ACL Add</a></li>
     <li ><a data-toggle="tab" id=rule_refresh href="#aclrule">ACL Rule</a></li>
-    <li><a data-toggle="tab" href="#menu3">Menu 3</a></li>
+    <li><a data-toggle="tab" href="#menu3">Reserved Menu</a></li>
   </ul>
 
   <div class="tab-content">
 
     <div id="menu2" class="tab-pane fade in active">
-      <h3>Authentication</h3>
+      <h3>Authorization</h3>
       <!--<p>Only after authentication, you can set the acl rule. The username and password shoul be same with your OpenDaylight</p> -->
       <p>. </p>
       <p> </p>
@@ -66,7 +66,7 @@
     </div>
     <div class="form-group">        
       <div class="col-sm-offset-5 col-sm-10">
-        <button id=authentication type="submit" class="btn btn-success">Authentication</button>
+        <button id=authentication type="submit" class="btn btn-success">Authorization</button>
       </div>
     </div>
   </form>
@@ -240,10 +240,10 @@ function show_acl_rules(rules)
                                 }
                                 $( 'select[name="nodeid"]' ).append( opts);
 
-                                alert('Authentication Success');
+                                alert('Authorization Success');
                             },
                             error: function () {
-                                alert("Authentication Fail");
+                                alert("Authorization Fail");
 
                             }
                         });
